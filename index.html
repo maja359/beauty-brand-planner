@@ -188,7 +188,7 @@
   <div class="dots" id="dots"></div>
 
   <div class="result-actions">
-    <button class="btn" onclick="downloadSlide()">Download this card</button>
+    <button class="btn" onclick="downloadSlide()">Save / share this card</button>
     <button class="btn ghost" onclick="bookCall()">See if it's a fit → book a call</button>
     <button class="btn ghost" onclick="restart()">Retake</button>
   </div>
@@ -488,9 +488,19 @@ function move(d){ goto(slideIdx+d); }
 function downloadSlide(){
   const el=document.querySelectorAll('#slides .slide')[slideIdx];
   html2canvas(el,{scale:3,backgroundColor:null,useCORS:true}).then(c=>{
-    const a=document.createElement('a');
-    a.download=`my-beauty-brand-aesthetic-${slideIdx+1}.png`;
-    a.href=c.toDataURL('image/png'); a.click();
+    c.toBlob(async (blob)=>{
+      const file=new File([blob],`beauty-brand-aesthetic-${slideIdx+1}.png`,{type:'image/png'});
+      // Mobile: native share sheet (post straight to Stories / save to photos)
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        try{ await navigator.share({files:[file],title:'My beauty brand aesthetic'}); return; }
+        catch(_){ /* cancelled -> fall through to download */ }
+      }
+      // Desktop: download
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.download=file.name; a.href=url; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),4000);
+    },'image/png');
   });
 }
 

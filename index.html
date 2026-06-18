@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What's your beauty brand aesthetic? — Beauty Brand Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:ital@0;1&family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&family=Playfair+Display:wght@500;700;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --bbp-yellow:#F3F08C;
+    --bbp-ink:#1d2b2b;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--bbp-yellow);
+    color:var(--bbp-ink);
+    -webkit-font-smoothing:antialiased;
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    min-height:100vh;padding:clamp(28px,5vh,56px) 24px;
+  }
+  .logo{font-family:'Cormorant Garamond',serif;font-size:20px;line-height:1;text-align:center}
+  .logo em{display:block;font-style:italic;font-size:22px;margin-top:-2px}
+
+  /* ---------- SCREENS ---------- */
+  .screen{width:100%;max-width:760px;display:none;animation:fade .5s var(--ease)}
+  .screen.active{display:block}
+  /* intro + gate centre themselves; ID specificity must only apply when active */
+  #intro.active{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 96px)}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- INTRO ---------- */
+  .intro{text-align:center;display:flex;flex-direction:column;align-items:center;gap:26px}
+  .intro h1{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(40px,8vw,72px);line-height:1.02;letter-spacing:-.01em}
+  .intro p{font-size:17px;max-width:430px;line-height:1.55;opacity:.8}
+  .btn{
+    background:var(--bbp-ink);color:var(--bbp-yellow);border:none;cursor:pointer;
+    font-family:'Inter';font-weight:600;font-size:15px;letter-spacing:.02em;
+    padding:16px 38px;border-radius:100px;transition:transform .2s var(--ease),opacity .2s;
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn.ghost{background:transparent;color:var(--bbp-ink);border:1.5px solid rgba(29,43,43,.3)}
+  .meta{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.5}
+
+  /* ---------- QUIZ ---------- */
+  .q-head{text-align:center;margin-bottom:30px}
+  .q-progress{display:flex;gap:6px;justify-content:center;margin-bottom:22px}
+  .q-progress span{width:34px;height:4px;border-radius:4px;background:rgba(29,43,43,.18)}
+  .q-progress span.on{background:var(--bbp-ink)}
+  .q-head h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(26px,5vw,38px);line-height:1.1}
+  .q-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .tile{
+    border:none;cursor:pointer;border-radius:16px;overflow:hidden;aspect-ratio:3/4;
+    position:relative;background:#fff;transition:transform .18s var(--ease),box-shadow .18s;
+    display:flex;flex-direction:column;text-align:left;
+  }
+  .tile:hover{transform:translateY(-3px);box-shadow:0 16px 30px -14px rgba(0,0,0,.35)}
+  .tile .vis{flex:1;display:flex;align-items:center;justify-content:center;font-weight:600;position:relative}
+  .tile .cap{font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:9px 10px;background:#fff;color:var(--bbp-ink);font-weight:600}
+  .tile .swatches{position:absolute;inset:0;display:flex;flex-direction:column}
+  .tile .swatches i{flex:1}
+  .tile .typ{font-size:34px}
+  .tile .mood{width:100%;height:100%;display:flex;align-items:flex-end;padding:12px;color:#fff;font-size:15px;font-weight:600}
+  @media(max-width:560px){.q-grid{grid-template-columns:repeat(2,1fr)}.tile .typ{font-size:26px}}
+
+  /* ---------- RESULT ---------- */
+  #result{max-width:1000px;text-align:center}
+  .result-intro{margin-bottom:24px}
+  .result-intro .meta{margin-bottom:8px}
+  .result-intro h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(30px,6vw,52px);line-height:1.05}
+  .result-intro h2 small{display:block;font-size:15px;font-family:'Inter';font-weight:500;opacity:.65;margin-top:10px;letter-spacing:.02em}
+
+  .carousel{position:relative;display:flex;justify-content:center;align-items:center;gap:16px}
+  .nav{background:#fff;border:none;width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:18px;flex:0 0 auto;box-shadow:0 6px 16px -8px rgba(0,0,0,.4);transition:transform .15s}
+  .nav:hover{transform:scale(1.08)}
+  .slides{width:340px;height:604px;flex:0 0 auto;position:relative}
+  @media(max-width:520px){.slides{width:300px;height:533px}.nav{width:36px;height:36px}}
+
+  .slide{
+    position:absolute;inset:0;border-radius:20px;overflow:hidden;
+    display:none;flex-direction:column;box-shadow:0 30px 60px -22px rgba(0,0,0,.4);
+  }
+  .slide.show{display:flex}
+  .slide .credit{
+    margin-top:auto;display:flex;justify-content:space-between;align-items:center;
+    font-size:10.5px;letter-spacing:.03em;padding:14px 20px;border-top:1px solid currentColor;
+  }
+  .slide .credit b{font-weight:600}
+  .slide .eyebrow{font-size:10px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;opacity:.6}
+
+  /* slide 1 hero */
+  .s-hero{padding:0}
+  .s-hero .board{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px}
+  .s-hero .board .ph{display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.55;text-align:center;padding:6px}
+  .s-hero .board .ph:first-child{grid-column:1/3}
+  .s-hero .cap{padding:20px}
+  .s-hero .cap h3{font-size:32px;line-height:1.0;margin-bottom:8px}
+  .s-hero .cap .lean{font-size:12px;opacity:.7;margin-bottom:12px}
+  .s-hero .cap .pos{font-size:16px;line-height:1.35}
+
+  /* generic content slides */
+  .s-body{padding:26px 22px}
+  .s-body .eyebrow{margin-bottom:18px}
+  .s-body h3{font-size:24px;line-height:1.05;margin-bottom:18px}
+  .pal-row{display:flex;flex-direction:column;gap:7px}
+  .pal-row .sw{height:46px;border-radius:8px;display:flex;align-items:center;padding:0 14px;font-size:11px;letter-spacing:.05em;font-weight:500}
+  .type-demo .big{font-size:64px;line-height:1;margin-bottom:4px}
+  .type-demo .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:22px}
+  .kw-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+  .kw-list span{font-size:13px;padding:7px 14px;border-radius:100px}
+  .ref-lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.55;margin-bottom:8px}
+  .ref-list{font-size:14px;line-height:1.6}
+  .move .row{margin-bottom:16px}
+  .move .row .t{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:5px}
+  .move .row .d{font-size:14px;line-height:1.45}
+  .move .cta{margin-top:auto;text-align:center;padding:14px;border-radius:12px;font-size:13px;font-weight:600}
+
+  .dots{display:flex;gap:7px;justify-content:center;margin-top:18px}
+  .dots i{width:8px;height:8px;border-radius:50%;background:rgba(29,43,43,.25);cursor:pointer}
+  .dots i.on{background:var(--bbp-ink)}
+
+  .result-actions{display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+
+  /* ---------- EMAIL GATE ---------- */
+  #gate{max-width:460px;text-align:center;flex-direction:column;gap:18px;align-items:center;min-height:calc(100vh - 96px);justify-content:center}
+  #gate.active{display:flex}
+  #gate h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;line-height:1.1}
+  #gate p{font-size:15px;line-height:1.5;opacity:.8;max-width:380px}
+  #gate form{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px}
+  #gate input{padding:15px 18px;border-radius:100px;border:1.5px solid rgba(29,43,43,.25);font-size:15px;font-family:'Inter';background:#fff;text-align:center}
+  .gate-skip{font-size:12px;opacity:.5;text-decoration:underline;cursor:pointer;background:none;border:none}
+  .fineprint{font-size:11px;opacity:.5;line-height:1.4;max-width:320px}
+</style>
+</head>
+<body>
+
+<!-- ============ INTRO ============ -->
+<section class="screen active" id="intro">
+  <div class="intro">
+    <div class="logo">Beauty Brand <em>Planner</em></div>
+    <h1>What's your beauty brand aesthetic?</h1>
+    <p>A 60-second visual quiz for beauty founders. Pick what you're drawn to, get the aesthetic your brand is reaching for, plus the palette, type and references behind it.</p>
+    <button class="btn" onclick="start()">Start the quiz</button>
+    <div class="meta">Free · 60 seconds · shareable result</div>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="screen" id="quiz">
+  <div class="q-head">
+    <div class="q-progress" id="progress"></div>
+    <h2 id="q-title"></h2>
+  </div>
+  <div class="q-grid" id="q-grid"></div>
+</section>
+
+<!-- ============ EMAIL GATE ============ -->
+<section class="screen" id="gate">
+  <div class="logo">Beauty Brand <em>Planner</em></div>
+  <h2>Your aesthetic is ready.</h2>
+  <p>Drop your email and we'll send the high-res cards plus your free Beauty Brand Starter Kit, a workbook to turn this aesthetic into a real brand.</p>
+  <form onsubmit="submitEmail(event)">
+    <input type="email" id="email" placeholder="you@brand.com" required>
+    <button class="btn" type="submit">Show my result</button>
+  </form>
+  <button class="gate-skip" onclick="reveal()">Just show the result</button>
+  <div class="fineprint">No spam. One short series about your aesthetic, then you choose if we talk. Built by Owlsome Studio.</div>
+</section>
+
+<!-- ============ RESULT ============ -->
+<section class="screen" id="result">
+  <div class="result-intro">
+    <div class="meta">Your beauty brand aesthetic</div>
+    <h2 id="r-name"></h2>
+    <h2 style="font-family:Inter"><small id="r-lean"></small></h2>
+  </div>
+
+  <div class="carousel">
+    <button class="nav" onclick="move(-1)">‹</button>
+    <div class="slides" id="slides"></div>
+    <button class="nav" onclick="move(1)">›</button>
+  </div>
+  <div class="dots" id="dots"></div>
+
+  <div class="result-actions">
+    <button class="btn" onclick="downloadSlide()">Download this card</button>
+    <button class="btn ghost" onclick="bookCall()">See if it's a fit → book a call</button>
+    <button class="btn ghost" onclick="restart()">Retake</button>
+  </div>
+  <div class="fineprint" style="margin:18px auto 0">Tag <b>@beautybrandplanner</b> when you share, we repost the good ones.</div>
+</section>
+
+<!-- hidden Mailchimp sink: email posts here without leaving the page -->
+<iframe name="mc-sink" style="display:none" title="mc"></iframe>
+<form id="mc-form" target="mc-sink" method="post" style="display:none">
+  <input type="email" name="EMAIL">
+  <input type="text" name="AESTHETIC">
+  <!-- Mailchimp honeypot: must exist and stay empty or submits are flagged as bot -->
+  <input type="text" name="b_824f7ddd23f058c977aff8f92_0095e3d0dc" tabindex="-1" value="">
+</form>
+
+<script>
+/* ============================================================
+   CONFIG — paste these once the accounts exist. Nothing else to touch.
+   ============================================================ */
+const CONFIG = {
+  // Mailchimp: Audience → Signup forms → Embedded forms → copy the <form action="..."> URL
+  // (looks like https://xxxxx.us1.list-manage.com/subscribe/post?u=...&id=... )
+  MAILCHIMP_ACTION: "https://weareowlsome.us5.list-manage.com/subscribe/post?u=824f7ddd23f058c977aff8f92&id=0095e3d0dc",
+  AESTHETIC_FIELD: "AESTHETIC", // a text merge field in the audience (tag = AESTHETIC) to segment nurture by style
+  CALENDLY: "https://calendly.com/majaregula/project-fit-call"
+};
+
+/* ============================================================
+   STYLE DATA — straight from the Beauty Brand Starter Kit (p.40–57)
+   To add real photos later: fill each style's `imgs` with URLs.
+   ============================================================ */
+const STYLES = {
+  clinical:{
+    name:"Clinical /<br>Dermocosmetic",
+    flat:"Clinical / Dermocosmetic",
+    font:"'Inter Tight',sans-serif",
+    bg:"#EEF3F5", ink:"#16323D",
+    pos:"Proof you can see.",
+    palette:[["#FFFFFF","FFFFFF"],["#EEF2F4","EEF2F4"],["#C9D6DC","C9D6DC"],["#6E8A99","6E8A99"],["#16323D","16323D"]],
+    typeFont:"'Inter Tight',sans-serif", typeName:"Inter Tight + Inter",
+    keywords:["Precise","Clinical","Trusted"],
+    refs:"The Ordinary · Paula's Choice · Typology · Dr. Barbara Sturm",
+    leanIn:"White space, cool neutrals, ingredient close-ups, bright controlled light.",
+    avoid:"Looking too cold, too generic, or too pharmacy-basic.",
+    moods:["Clean skin close-up","Serum texture macro","Single bottle, soft shadow","Lab-bright product row"]
+  },
+  quiet:{
+    name:"Soft Minimal /<br>Quiet Luxury",
+    flat:"Soft Minimal / Quiet Luxury",
+    font:"'Cormorant Garamond',serif",
+    bg:"#EFE9E0", ink:"#2E2A24",
+    pos:"Expensive without shouting.",
+    palette:[["#F3EEE7","F3EEE7"],["#E0D8CC","E0D8CC"],["#C3B7A4","C3B7A4"],["#8A7E6B","8A7E6B"],["#2E2A24","2E2A24"]],
+    typeFont:"'Cormorant Garamond',serif", typeName:"Cormorant + Inter",
+    keywords:["Refined","Restrained","Timeless"],
+    refs:"Nécessaire · Augustinus Bader · MERIT · Westman Atelier",
+    leanIn:"Generous space, stone and cream, soft light, tactile product shots.",
+    avoid:"Feeling too empty, too safe, or like every other minimal brand.",
+    moods:["Bottle on stone","Soft drape fabric","Travertine texture","Quiet shadow play"]
+  },
+  botanical:{
+    name:"Natural /<br>Botanical",
+    flat:"Natural / Botanical",
+    font:"'Fraunces',serif",
+    bg:"#ECEFE2", ink:"#3a4a2f",
+    pos:"Grounded, sensory, real.",
+    palette:[["#EAEDE1","EAEDE1"],["#C7D2B4","C7D2B4"],["#93A878","93A878"],["#C99A78","C99A78"],["#5b4a37","5B4A37"]],
+    typeFont:"'Fraunces',serif", typeName:"Fraunces + Inter",
+    keywords:["Warm","Natural","Grounded"],
+    refs:"Susanne Kaufmann · F. Miller · Bamford · Aurelia London",
+    leanIn:"Botanical ingredients, natural texture, warm light, ritual imagery.",
+    avoid:"Looking too rustic, too eco-cliché, or too soft to feel premium.",
+    moods:["Dewy petals, droplets","Sage-green backdrop","Hand applying cream","Florals beside bottle"]
+  },
+  editorial:{
+    name:"Bold Editorial /<br>Fashion Beauty",
+    flat:"Bold Editorial / Fashion Beauty",
+    font:"'Archivo',sans-serif",
+    bg:"#111111", ink:"#FFFFFF",
+    pos:"Made to be seen.",
+    palette:[["#111111","111111"],["#FFFFFF","FFFFFF"],["#E2231A","E2231A"],["#1B33CC","1B33CC"],["#FF5A1F","FF5A1F"]],
+    typeFont:"'Archivo',sans-serif", typeName:"Archivo + Inter",
+    keywords:["Bold","Editorial","Confident"],
+    refs:"Topicals · Eadem · Isamaya · about-face",
+    leanIn:"Oversized type, high contrast, fashion-led photography, strong styling.",
+    avoid:"Feeling too loud, too trend-driven, or too fashion-only to be believed.",
+    moods:["Directional beauty shot","Color-blocked carton","Stark product, hard shadow","Oversized type poster"]
+  },
+  playful:{
+    name:"Playful Pop /<br>Color-Driven",
+    flat:"Playful Pop / Color-Driven",
+    font:"'Space Grotesk',sans-serif",
+    bg:"#FFE9F1", ink:"#5a1133",
+    pos:"Wellness that pops off the shelf.",
+    palette:[["#FF7FB0","FF7FB0"],["#FF8A3D","FF8A3D"],["#57C4E5","57C4E5"],["#B6E34B","B6E34B"],["#FFD23E","FFD23E"]],
+    typeFont:"'Space Grotesk',sans-serif", typeName:"Space Grotesk + Inter",
+    keywords:["Fresh","Playful","Memorable"],
+    refs:"Bubble · Starface · Glow Recipe · Vacation",
+    leanIn:"Saturated colour, bold blocks, glossy texture, upbeat product sets.",
+    avoid:"Looking childish, cheap, or visually chaotic.",
+    moods:["Pop-color product set","Gummy / powder splash","Glossy gel macro","Bright playful styling"]
+  },
+  heritage:{
+    name:"Apothecary /<br>Heritage Modern",
+    flat:"Apothecary / Heritage Modern",
+    font:"'EB Garamond',serif",
+    bg:"#EDE5D6", ink:"#2C2117",
+    pos:"Depth, craft, atmosphere.",
+    palette:[["#E7DDC8","E7DDC8"],["#B68A4E","B68A4E"],["#5A5234","5A5234"],["#5C2230","5C2230"],["#2C2117","2C2117"]],
+    typeFont:"'EB Garamond',serif", typeName:"EB Garamond + Inter",
+    keywords:["Rich","Crafted","Storied"],
+    refs:"Le Labo · Aesop · Santa Maria Novella · Grown Alchemist",
+    leanIn:"Moody product shots, dark glass, wrap labels, deeper tonal worlds.",
+    avoid:"Feeling too heavy, too old-fashioned, or too artisan-shop.",
+    moods:["Moody bottle on plinth","Amber glass, warm light","Textured wrap label","Ritual close-up"]
+  }
+};
+
+/* ============================================================
+   QUIZ — each option tagged to a style key. Tally → primary + lean.
+   ============================================================ */
+const ORDER = ["clinical","quiet","botanical","editorial","playful","heritage"];
+const QUESTIONS = [
+  { title:"Which palette pulls you in?", kind:"palette" },
+  { title:"Which packaging feels like your brand?", kind:"pack" },
+  { title:"Pick a campaign mood.", kind:"mood" },
+  { title:"Choose a typography vibe.", kind:"type" },
+  { title:"One word for the brand.", kind:"word",
+    words:{clinical:"Proven",quiet:"Refined",botanical:"Natural",editorial:"Bold",playful:"Fun",heritage:"Storied"} }
+];
+
+let qi=0, scores={};
+ORDER.forEach(k=>scores[k]=0);
+
+function start(){ qi=0; ORDER.forEach(k=>scores[k]=0); show('quiz'); renderQ(); }
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function renderQ(){
+  const q=QUESTIONS[qi];
+  document.getElementById('q-title').textContent=q.title;
+  // progress
+  const pr=document.getElementById('progress'); pr.innerHTML='';
+  QUESTIONS.forEach((_,i)=>{const s=document.createElement('span');if(i<=qi)s.className='on';pr.appendChild(s);});
+  // tiles
+  const grid=document.getElementById('q-grid'); grid.innerHTML='';
+  ORDER.forEach(key=>{
+    const st=STYLES[key];
+    const t=document.createElement('button'); t.className='tile';
+    let vis='';
+    if(q.kind==='palette'){
+      vis=`<div class="swatches">${st.palette.map(p=>`<i style="background:${p[0]}"></i>`).join('')}</div>`;
+      t.innerHTML=`<div class="vis">${vis}</div>`;
+    } else if(q.kind==='type'){
+      t.innerHTML=`<div class="vis" style="background:${st.bg};color:${st.ink}"><span class="typ" style="font-family:${st.typeFont}">Aa</span></div>`;
+    } else if(q.kind==='mood'){
+      t.innerHTML=`<div class="vis" style="background:${st.bg}"><div class="mood" style="background:linear-gradient(180deg,transparent,${st.ink}cc);color:#fff">${st.moods[0]}</div></div>`;
+    } else if(q.kind==='word'){
+      t.innerHTML=`<div class="vis" style="background:${st.bg};color:${st.ink};font-family:${st.typeFont};font-size:24px">${q.words[key]}</div>`;
+    } else { // pack
+      t.innerHTML=`<div class="vis" style="background:${st.bg}"><div style="width:42%;height:64%;background:${st.palette[3][0]};border-radius:6px 6px 3px 3px;position:relative">
+        <div style="position:absolute;left:50%;top:8px;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:${st.palette[4][0]}"></div>
+        <div style="position:absolute;bottom:10px;left:0;right:0;height:30%;background:${st.palette[0][0]};opacity:.85"></div></div></div>`;
+    }
+    t.innerHTML+=`<div class="cap">${st.flat.split(' / ')[0]}</div>`;
+    t.onclick=()=>pick(key);
+    grid.appendChild(t);
+  });
+}
+
+function pick(key){
+  scores[key]+= (qi===0?2:1); // palette weighted slightly
+  qi++;
+  if(qi<QUESTIONS.length){ renderQ(); }
+  else { computeResult(); show('gate'); }
+}
+
+let primary, lean;
+function computeResult(){
+  const ranked=ORDER.slice().sort((a,b)=>scores[b]-scores[a]);
+  primary=ranked[0]; lean=ranked[1];
+  buildResult();
+}
+
+/* ============================================================
+   EMAIL GATE
+   ============================================================ */
+function submitEmail(e){
+  e.preventDefault();
+  const email=document.getElementById('email').value;
+  try{ window.localStorage.setItem('bbp_email',email); window.localStorage.setItem('bbp_style',primary);}catch(_){}
+  // Post to Mailchimp embedded-form endpoint via a hidden iframe (no backend, no page nav, no CORS block).
+  if(CONFIG.MAILCHIMP_ACTION){
+    const f=document.getElementById('mc-form');
+    f.action=CONFIG.MAILCHIMP_ACTION;
+    f.querySelector('[name=EMAIL]').value=email;
+    f.querySelector('[name="'+CONFIG.AESTHETIC_FIELD+'"]').value=primary;
+    try{ f.submit(); }catch(_){}
+  }
+  reveal();
+}
+function reveal(){ show('result'); }
+
+/* ============================================================
+   RESULT CAROUSEL
+   ============================================================ */
+let slideIdx=0, totalSlides=5;
+function buildResult(){
+  const st=STYLES[primary];
+  document.getElementById('r-name').innerHTML=st.flat;
+  document.getElementById('r-lean').textContent='with a '+STYLES[lean].flat.split(' / ')[0]+' lean';
+
+  const wrap=document.getElementById('slides'); wrap.innerHTML='';
+  const credit=`<div class="credit"><b>crafted with Owlsome</b><span>weareowlsome.com</span></div>`;
+  const baseStyle=`background:${st.bg};color:${st.ink};font-family:${st.font}`;
+
+  // SLIDE 1 — HERO
+  const board = st.imgs ? st.imgs.map((u,i)=>`<div class="ph" style="background:url(${u}) center/cover"></div>`).join('')
+    : st.moods.map(m=>`<div class="ph" style="background:${st.palette[2][0]}33">${m}</div>`).join('');
+  wrap.insertAdjacentHTML('beforeend',`
+    <div class="slide s-hero show" style="${baseStyle}">
+      <div class="board">${board}</div>
+      <div class="cap">
+        <div class="eyebrow" style="font-family:Inter">Your beauty brand aesthetic</div>
+        <h3 style="margin-top:6px">${st.name}</h3>
+        <div class="lean" style="font-family:Inter">with a ${STYLES[lean].flat.split(' / ')[0]} lean</div>
+        <div class="pos">${st.pos}</div>
+      </div>
+      ${credit}
+    </div>`);
+
+  // SLIDE 2 — PALETTE
+  wrap.insertAdjacentHTML('beforeend',`
+    <div class="slide s-body" style="${baseStyle}">
+      <div class="eyebrow" style="font-family:Inter">Palette</div>
+      <h3>The colours your<br>brand lives in.</h3>
+      <div class="pal-row">${st.palette.map(p=>{
+        const dark=parseInt(p[1],16)<0x888888;
+        return `<div class="sw" style="background:${p[0]};color:${dark?'#fff':st.ink};font-family:Inter">#${p[1]}</div>`;
+      }).join('')}</div>
+      ${credit}
+    </div>`);
+
+  // SLIDE 3 — TYPE
+  wrap.insertAdjacentHTML('beforeend',`
+    <div class="slide s-body" style="${baseStyle}">
+      <div class="eyebrow" style="font-family:Inter">Typography</div>
+      <h3>The voice on<br>the page.</h3>
+      <div class="type-demo">
+        <div class="big">Aa</div>
+        <div class="lbl" style="font-family:Inter">${st.typeName}</div>
+        <p style="font-size:15px;line-height:1.4;font-family:Inter">Headlines carry the character. Body stays clean and quiet so the look does the talking.</p>
+      </div>
+      ${credit}
+    </div>`);
+
+  // SLIDE 4 — CHARACTER
+  wrap.insertAdjacentHTML('beforeend',`
+    <div class="slide s-body" style="${baseStyle}">
+      <div class="eyebrow" style="font-family:Inter">Character</div>
+      <h3>How it should<br>feel.</h3>
+      <div class="kw-list">${st.keywords.map(k=>`<span style="background:${st.ink}1a;font-family:Inter">${k}</span>`).join('')}</div>
+      <div class="ref-lbl" style="font-family:Inter">In good company</div>
+      <div class="ref-list" style="font-family:Inter">${st.refs}</div>
+      ${credit}
+    </div>`);
+
+  // SLIDE 5 — YOUR MOVE
+  wrap.insertAdjacentHTML('beforeend',`
+    <div class="slide s-body move" style="${baseStyle}">
+      <div class="eyebrow" style="font-family:Inter">Your next move</div>
+      <h3>Make it real.</h3>
+      <div class="row"><div class="t" style="font-family:Inter">Lean into</div><div class="d" style="font-family:Inter">${st.leanIn}</div></div>
+      <div class="row"><div class="t" style="font-family:Inter">Avoid</div><div class="d" style="font-family:Inter">${st.avoid}</div></div>
+      <div class="cta" style="background:${st.ink};color:${st.bg};font-family:Inter">This is a glimpse. Owlsome builds the real thing in 6 weeks → book a call</div>
+      ${credit}
+    </div>`);
+
+  // dots
+  const dots=document.getElementById('dots'); dots.innerHTML='';
+  for(let i=0;i<totalSlides;i++){const d=document.createElement('i');if(i===0)d.className='on';d.onclick=()=>goto(i);dots.appendChild(d);}
+  slideIdx=0;
+}
+
+function goto(i){
+  const slides=document.querySelectorAll('#slides .slide');
+  slideIdx=(i+totalSlides)%totalSlides;
+  slides.forEach((s,j)=>s.classList.toggle('show',j===slideIdx));
+  document.querySelectorAll('#dots i').forEach((d,j)=>d.classList.toggle('on',j===slideIdx));
+}
+function move(d){ goto(slideIdx+d); }
+
+function downloadSlide(){
+  const el=document.querySelectorAll('#slides .slide')[slideIdx];
+  html2canvas(el,{scale:3,backgroundColor:null,useCORS:true}).then(c=>{
+    const a=document.createElement('a');
+    a.download=`my-beauty-brand-aesthetic-${slideIdx+1}.png`;
+    a.href=c.toDataURL('image/png'); a.click();
+  });
+}
+
+function bookCall(){ window.open(CONFIG.CALENDLY,'_blank'); }
+function restart(){ show('intro'); }
+</script>
+</body>
+</html>

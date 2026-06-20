@@ -516,7 +516,10 @@ async function downloadSlide(btn){
     await Promise.all([...el.querySelectorAll('img')].map(img=>
       img.complete?Promise.resolve():new Promise(r=>{img.onload=img.onerror=r;})));
     const canvas=await html2canvas(el,{scale:2,backgroundColor:null,useCORS:true,logging:false});
-    const blob=await new Promise(res=>canvas.toBlob(res,'image/png',0.95));
+    let blob=await new Promise(res=>canvas.toBlob(res,'image/png',0.95));
+    if(!blob){ // some Android browsers return null from toBlob — rebuild it from the data URL
+      try{ blob=await (await fetch(canvas.toDataURL('image/png'))).blob(); }catch(_){}
+    }
     const file=blob?new File([blob],`beauty-brand-aesthetic-${slideIdx+1}.png`,{type:'image/png'}):null;
 
     // 1) Native share sheet (mobile) — straight to Stories / save to photos

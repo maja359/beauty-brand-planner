@@ -185,7 +185,7 @@
 
 <!-- ============ INTRO ============ -->
 <section class="screen active" id="intro">
-  <div class="logo topbar">Beauty Brand <em>Planner</em></div>
+  <div class="logo topbar" onclick="show('intro')" role="button" tabindex="0" style="cursor:pointer">Beauty Brand <em>Planner</em></div>
   <div class="intro">
     <h1>What's your beauty brand aesthetic?</h1>
     <p>A 60-second visual quiz for beauty founders. Pick what you're drawn to, get the aesthetic your brand is reaching for, plus the palette, type and references behind it.</p>
@@ -205,7 +205,7 @@
 
 <!-- ============ RESULT ============ -->
 <section class="screen" id="result">
-  <div class="logo topbar">Beauty Brand <em>Planner</em></div>
+  <div class="logo topbar" onclick="show('intro')" role="button" tabindex="0" style="cursor:pointer">Beauty Brand <em>Planner</em></div>
 
   <div class="carousel">
     <button class="nav" onclick="move(-1)">‹</button>
@@ -466,7 +466,7 @@ function buildResult(){
   const T=TYPE[primary];
 
   const wrap=document.getElementById('slides'); wrap.innerHTML='';
-  const credit=`<div class="credit"><b>crafted with Owlsome</b><span>weareowlsome.com</span></div>`;
+  const credit=``;
   const baseStyle=`background:#fff;color:${ink}`;
 
   // SLIDE 1 — HERO (2x2 photo board, falls back to tinted mood labels until photos exist)

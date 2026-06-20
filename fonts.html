@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBP — headline font picker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Big+Shoulders+Display:wght@600&family=Bodoni+Moda:wght@600&family=Cormorant:wght@600&family=DM+Serif+Display&family=EB+Garamond:wght@600&family=Familjen+Grotesk:wght@600&family=Forum&family=Frank+Ruhl+Libre:wght@700&family=Fraunces:opsz,wght@9..144,600&family=Gilda+Display&family=Hanken+Grotesk:wght@700&family=Inter+Tight:wght@600&family=Italiana&family=Libre+Baskerville:wght@700&family=Lora:wght@600&family=Manrope:wght@700&family=Marcellus&family=Newsreader:wght@500&family=Outfit:wght@600&family=Playfair+Display:wght@700&family=Prata&family=Schibsted+Grotesk:wght@600&family=Space+Grotesk:wght@600&family=Spectral:wght@500&family=Syne:wght@700&family=Tenor+Sans&family=Unbounded:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#FAF9F6;--ink:#1A1A1A;--line:#E4E0D8}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:48px 24px 80px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto}
+  header{text-align:center;margin-bottom:48px}
+  header h1{font-size:30px;font-weight:600;letter-spacing:-.01em;margin-bottom:12px}
+  header p{font-size:14px;line-height:1.6;opacity:.7;max-width:560px;margin:0 auto}
+  header p b{font-weight:600}
+  .group-title{font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.45;font-weight:600;margin:40px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .card{padding:22px 0;border-bottom:1px solid var(--line)}
+  .meta{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .fname{font-size:14px;font-weight:600}
+  .tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.5;font-weight:600}
+  .badge{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;background:#1A1A1A;color:var(--cream);padding:3px 9px;border-radius:100px}
+  .vibe{font-size:12.5px;opacity:.6}
+  .sample{font-size:clamp(34px,6vw,52px);line-height:1.05;margin-bottom:8px}
+  .abc{font-size:20px;opacity:.55}
+  @media(max-width:560px){.sample{font-size:32px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Headline font picker</h1>
+    <p>Pick one headline font per style, then send me the names. The <b>badge</b> shows what each style uses right now. Body font stays <b>Inter</b> everywhere. Any other Google Font also works, just name it.</p>
+  </header>
+  <div id="list"></div>
+</div>
+
+<script>
+const FONTS = [
+  ["Elegant / high-contrast serif", [
+    ["Playfair Display","serif","Classic fashion-beauty serif, sharp and editorial.",""],
+    ["Bodoni Moda","serif","Vogue-style high contrast, very luxe.",""],
+    ["DM Serif Display","serif","Dramatic, romantic, big personality.",""],
+    ["Prata","serif","Slim, refined, quietly expensive.",""],
+    ["Cormorant","serif","Delicate and airy.","quiet"],
+    ["Gilda Display","serif","Soft luxury, gentle contrast.",""],
+    ["Italiana","serif","Couture, minimal, elongated.",""],
+    ["Frank Ruhl Libre","serif","Editorial with backbone.",""],
+  ]],
+  ["Soft / organic serif", [
+    ["Fraunces","serif","Warm, characterful, a little quirky.","botanical"],
+    ["Newsreader","serif","Friendly editorial, very readable.",""],
+    ["Spectral","serif","Calm, modern, considered.",""],
+    ["Lora","serif","Balanced, approachable, classic.",""],
+    ["EB Garamond","serif","Old-style, storied, timeless.","heritage"],
+    ["Libre Baskerville","serif","Traditional, trustworthy.",""],
+    ["Marcellus","serif","Inscriptional, elegant, calm.",""],
+    ["Forum","serif","Roman, heritage, apothecary feel.",""],
+  ]],
+  ["Modern grotesque / sans", [
+    ["Inter Tight","sans","Precise, engineered, clean.","clinical"],
+    ["Archivo","sans","Confident grotesque, big headlines.","editorial"],
+    ["Space Grotesk","sans","Geometric with quirks, modern.","playful"],
+    ["Schibsted Grotesk","sans","Sharp, contemporary, premium.",""],
+    ["Familjen Grotesk","sans","Quietly distinctive sans.",""],
+    ["Manrope","sans","Soft, rounded, friendly-clean.",""],
+    ["Outfit","sans","Even, minimal, neutral.",""],
+    ["Hanken Grotesk","sans","Crisp, sturdy, modern.",""],
+    ["Tenor Sans","sans","Airy luxury sans, lots of space.",""],
+  ]],
+  ["Display / characterful", [
+    ["Syne","sans","Arty, distinctive, design-forward.",""],
+    ["Unbounded","sans","Bold, rounded, playful pop.",""],
+    ["Big Shoulders Display","sans","Tall, industrial, striking.",""],
+  ]],
+];
+const STYLE_LABEL = {clinical:"Clinical",quiet:"Quiet Luxury",botanical:"Botanical",editorial:"Editorial",playful:"Playful",heritage:"Heritage"};
+const list = document.getElementById('list');
+FONTS.forEach(([group, items])=>{
+  const gt=document.createElement('div'); gt.className='group-title'; gt.textContent=group; list.appendChild(gt);
+  items.forEach(([name,kind,vibe,style])=>{
+    const c=document.createElement('div'); c.className='card';
+    c.innerHTML=`
+      <div class="meta">
+        <span class="fname">${name}</span>
+        <span class="tag">${kind}</span>
+        <span class="vibe">${vibe}</span>
+        ${style?`<span class="badge">now · ${STYLE_LABEL[style]}</span>`:''}
+      </div>
+      <div class="sample" style="font-family:'${name}'">Radiant by design</div>
+      <div class="abc" style="font-family:'${name}'">Aa Bb Cc Gg Qq Rr &nbsp; 1234567890</div>`;
+    list.appendChild(c);
+  });
+});
+</script>
+</body>
+</html>

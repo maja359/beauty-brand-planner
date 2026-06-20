@@ -103,8 +103,8 @@
   }
   .slide.show{display:flex}
   .slide .credit{
-    margin-top:auto;display:flex;justify-content:space-between;align-items:center;
-    font-size:10.5px;letter-spacing:.03em;padding:14px 20px;border-top:1px solid currentColor;font-family:var(--sans);
+    margin-top:auto;display:flex;justify-content:center;align-items:center;
+    font-size:10.5px;letter-spacing:.06em;padding:13px 20px;border-top:1px solid currentColor;font-family:var(--sans);opacity:.5;
   }
   .slide .credit b{font-weight:600}
   .slide .eyebrow{font-size:10px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;opacity:.6;font-family:var(--sans)}
@@ -466,7 +466,7 @@ function buildResult(){
   const T=TYPE[primary];
 
   const wrap=document.getElementById('slides'); wrap.innerHTML='';
-  const credit=``;
+  const credit=`<div class="credit">@beautybrandplanner</div>`;
   const baseStyle=`background:#fff;color:${ink}`;
 
   // SLIDE 1 — HERO (2x2 photo board, falls back to tinted mood labels until photos exist)

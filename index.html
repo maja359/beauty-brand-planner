@@ -254,6 +254,7 @@ pintrk('load','2612945747997');pintrk('page');
   <input type="email" name="EMAIL">
   <input type="text" name="FNAME">
   <input type="text" name="AESTHETIC">
+  <input type="text" name="ANAME">
   <!-- Mailchimp honeypot: must exist and stay empty or submits are flagged as bot -->
   <input type="text" name="b_824f7ddd23f058c977aff8f92_0095e3d0dc" tabindex="-1" value="">
 </form>
@@ -266,7 +267,14 @@ const CONFIG = {
   // Mailchimp: Audience → Signup forms → Embedded forms → copy the <form action="..."> URL
   MAILCHIMP_ACTION: "https://weareowlsome.us5.list-manage.com/subscribe/post?u=824f7ddd23f058c977aff8f92&id=0095e3d0dc",
   AESTHETIC_FIELD: "AESTHETIC", // text merge field (tag = AESTHETIC) to segment nurture by style
+  AESTHETIC_NAME_FIELD: "ANAME", // pretty style name for email personalisation (Mailchimp tag *|ANAME|*)
   CALENDLY: "https://calendly.com/majaregula/project-fit-call"
+};
+
+// clean labels for *|ANAME|* — STYLES[].name has <br> and slashes, not email-friendly
+const STYLE_NAMES = {
+  clinical:"Clinical", quiet:"Quiet Luxury", botanical:"Botanical",
+  editorial:"Editorial", playful:"Playful", heritage:"Heritage"
 };
 
 /* ============================================================
@@ -466,6 +474,7 @@ function submitEmail(e){
     f.querySelector('[name=EMAIL]').value=email;
     f.querySelector('[name=FNAME]').value=fname;
     f.querySelector('[name="'+CONFIG.AESTHETIC_FIELD+'"]').value=primary;
+    f.querySelector('[name="'+CONFIG.AESTHETIC_NAME_FIELD+'"]').value=STYLE_NAMES[primary]||primary;
     try{ f.submit(); }catch(_){}
   }
   // funnel conversion: email captured (shared Owlsome pixels)
@@ -650,6 +659,17 @@ function bookCall(){
   window.open(CONFIG.CALENDLY,'_blank');
 }
 function restart(){ show('intro'); }
+
+/* deep link: /?style=<key> jumps straight to that result — used by nurture emails ("view & save your card") */
+(function(){
+  const p=new URLSearchParams(location.search).get('style');
+  if(p && STYLES[p]){
+    primary=p;
+    lean=ORDER.find(k=>k!==p)||p; // emails only carry the primary key; lean is approximate on revisit
+    buildResult();
+    show('result');
+  }
+})();
 </script>
 </body>
 </html>

@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>What's your beauty brand aesthetic? — Beauty Brand Planner</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- real recommended fonts for the Typography result card -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Cormorant:wght@500;600;700&family=EB+Garamond:wght@500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500&family=Inter+Tight:wght@500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
   /* ---------- BRAND FONTS (self-hosted: exact match to beautybrandplanner.com,
      and same-origin so the result card renders to canvas on mobile) ---------- */
@@ -122,7 +126,7 @@
   .pal-row .sw{height:46px;border-radius:8px;display:flex;align-items:center;padding:0 14px;font-size:11px;letter-spacing:.05em;font-weight:500;font-family:var(--sans)}
   .type-demo .big{font-family:var(--serif);font-size:72px;line-height:1;margin-bottom:4px}
   .type-demo .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:22px;font-family:var(--sans)}
-  .kw-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+  .kw-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;justify-content:center}
   .kw-list span{font-size:13px;padding:7px 14px;border-radius:100px;font-family:var(--sans)}
   .ref-lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.55;margin-bottom:8px;font-family:var(--sans)}
   .ref-list{font-size:14px;line-height:1.6;font-family:var(--sans)}
@@ -146,6 +150,21 @@
   #gate input{padding:15px 18px;border-radius:100px;border:1.5px solid rgba(26,26,26,.2);font-size:15px;font-family:var(--sans);background:#fff;text-align:center}
   .gate-skip{font-size:12px;opacity:.5;text-decoration:underline;cursor:pointer;background:none;border:none;font-family:var(--sans)}
   .fineprint{font-size:11px;opacity:.5;line-height:1.4;max-width:320px;font-family:var(--sans)}
+
+  /* ---------- RESULT · TYPOGRAPHY CARD (real fonts) ---------- */
+  .s-type .type-pair{display:flex;flex-direction:column;gap:20px;text-align:left;margin-top:4px}
+  .tp-lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.5;margin-bottom:7px;font-family:var(--sans)}
+  .tp-head{font-size:42px;line-height:1.02}
+  .tp-body{font-size:14.5px;line-height:1.55}
+  .tp-note{font-size:13px;line-height:1.5;opacity:.72;font-family:var(--sans);border-top:1px solid currentColor;padding-top:15px}
+  /* ---------- RESULT · CHARACTER CARD ---------- */
+  .char-pos{font-family:var(--serif);font-size:23px;line-height:1.25;margin-bottom:22px}
+
+  /* ---------- INTRO · desktop sizing (mobile handled separately) ---------- */
+  @media(min-width:768px){
+    .intro h1{font-size:56px}
+    .intro p{font-size:14px;max-width:400px}
+  }
 </style>
 </head>
 <body>
@@ -318,6 +337,22 @@ Object.keys(STYLES).forEach(k=>{
   STYLES[k].imgs=[1,2,3,4].map(n=>`img/${k}/${n}.jpg`);
 });
 
+// Real font pairings shown on the Typography result card (families loaded from Google Fonts above).
+const TYPE = {
+  clinical: {head:"Inter Tight",   body:"Inter", note:"Tight, even, engineered. Reads as precise and trustworthy without feeling cold."},
+  quiet:    {head:"Cormorant",     body:"Inter", note:"A high-contrast serif with quiet elegance, set light and airy so it feels expensive."},
+  botanical:{head:"Fraunces",      body:"Inter", note:"A soft, organic serif. Warm and human, but still polished enough to feel premium."},
+  editorial:{head:"Archivo",       body:"Inter", note:"A grotesque with attitude. Big, confident, built to carry an oversized headline."},
+  playful:  {head:"Space Grotesk", body:"Inter", note:"Geometric with little quirks. Modern, friendly, and a touch unexpected."},
+  heritage: {head:"EB Garamond",   body:"Inter", note:"A classic old-style serif. Crafted, storied and timeless on the page."}
+};
+
+// Pick a text colour that stays readable on a white card (some styles use a light ink on dark).
+function readableInk(hex){
+  const h=hex.replace('#',''); const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  return (0.299*r+0.587*g+0.114*b)>150 ? '#1A1A1A' : hex;
+}
+
 /* ============================================================
    QUIZ — each option tagged to a style key. Tally → primary + lean.
    ============================================================ */
@@ -418,12 +453,14 @@ function reveal(){ show('result'); }
 let slideIdx=0, totalSlides=5;
 function buildResult(){
   const st=STYLES[primary];
+  const ink=readableInk(st.ink);
+  const T=TYPE[primary];
   document.getElementById('r-name').innerHTML=st.flat;
   document.getElementById('r-lean').textContent='with a '+STYLES[lean].flat.split(' / ')[0]+' lean';
 
   const wrap=document.getElementById('slides'); wrap.innerHTML='';
   const credit=`<div class="credit"><b>crafted with Owlsome</b><span>weareowlsome.com</span></div>`;
-  const baseStyle=`background:${st.bg};color:${st.ink}`;
+  const baseStyle=`background:#fff;color:${ink}`;
 
   // SLIDE 1 — HERO (2x2 photo board, falls back to tinted mood labels until photos exist)
   const board = st.moods.map((m,i)=>{
@@ -440,7 +477,6 @@ function buildResult(){
         <div class="eyebrow">Your beauty brand aesthetic</div>
         <h3 style="margin-top:6px">${st.name}</h3>
         <div class="lean">with a ${STYLES[lean].flat.split(' / ')[0]} lean</div>
-        <div class="pos">${st.pos}</div>
       </div>
       ${credit}
     </div>`);
@@ -452,20 +488,26 @@ function buildResult(){
       <h3>The colours your<br>brand lives in.</h3>
       <div class="pal-row">${st.palette.map(p=>{
         const dark=parseInt(p[1],16)<0x888888;
-        return `<div class="sw" style="background:${p[0]};color:${dark?'#fff':st.ink}">#${p[1]}</div>`;
+        return `<div class="sw" style="background:${p[0]};color:${dark?'#fff':ink}">#${p[1]}</div>`;
       }).join('')}</div>
       ${credit}
     </div>`);
 
-  // SLIDE 3 — TYPE
+  // SLIDE 3 — TYPE (real recommended fonts, shown live)
   wrap.insertAdjacentHTML('beforeend',`
-    <div class="slide s-body" style="${baseStyle}">
+    <div class="slide s-body s-type" style="${baseStyle}">
       <div class="eyebrow">Typography</div>
-      <h3>The voice on<br>the page.</h3>
-      <div class="type-demo">
-        <div class="big">Aa</div>
-        <div class="lbl">Recommended pairing · ${st.typeName}</div>
-        <p style="font-size:15px;line-height:1.4">Headlines carry the character. Body stays clean and quiet so the look does the talking.</p>
+      <h3>The fonts your<br>brand speaks in.</h3>
+      <div class="type-pair">
+        <div class="tp-row">
+          <div class="tp-lbl">Headline · ${T.head}</div>
+          <div class="tp-head" style="font-family:'${T.head}'">${st.keywords[0]} by design</div>
+        </div>
+        <div class="tp-row">
+          <div class="tp-lbl">Body · ${T.body}</div>
+          <div class="tp-body" style="font-family:'${T.body}'">Body copy stays clean and readable so the headline and the look lead. Set it generously, with room to breathe.</div>
+        </div>
+        <div class="tp-note">${T.note}</div>
       </div>
       ${credit}
     </div>`);
@@ -475,7 +517,8 @@ function buildResult(){
     <div class="slide s-body" style="${baseStyle}">
       <div class="eyebrow">Character</div>
       <h3>How it should<br>feel.</h3>
-      <div class="kw-list">${st.keywords.map(k=>`<span style="background:${st.ink}1a">${k}</span>`).join('')}</div>
+      <div class="char-pos">${st.pos}</div>
+      <div class="kw-list">${st.keywords.map(k=>`<span style="background:${ink}14">${k}</span>`).join('')}</div>
       <div class="ref-lbl">In good company</div>
       <div class="ref-list">${st.refs}</div>
       ${credit}
@@ -488,7 +531,7 @@ function buildResult(){
       <h3>Make it real.</h3>
       <div class="row"><div class="t">Lean into</div><div class="d">${st.leanIn}</div></div>
       <div class="row"><div class="t">Avoid</div><div class="d">${st.avoid}</div></div>
-      <div class="cta" style="background:${st.ink};color:${st.bg}">This is a glimpse. Owlsome builds the real thing in 6 weeks → book a call</div>
+      <div class="cta" style="background:${ink};color:#fff">This is a glimpse. Owlsome builds the real thing in 6 weeks → book a call</div>
       ${credit}
     </div>`);
 

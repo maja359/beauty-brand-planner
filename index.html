@@ -502,7 +502,9 @@ function move(d){ goto(slideIdx+d); }
 
 /* ----- Save / share the current card (mobile share sheet, desktop download) -----
    Self-hosted fonts + same-origin photos keep the canvas clean, so toBlob works on iOS. */
-const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+// Any touch device (phone/tablet, incl. in-app webviews) must NOT use an <a download> click —
+// it navigates to a blob/data URL and webviews crash with "cannot load page". Desktop only.
+const isTouch=navigator.maxTouchPoints>0||/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 async function downloadSlide(btn){
   const el=document.querySelectorAll('#slides .slide')[slideIdx];
   const label = btn ? btn.textContent : '';
@@ -523,8 +525,8 @@ async function downloadSlide(btn){
       catch(_){ /* user cancelled — stop here, never navigate to a data URL (that kills the page on iOS) */ }
       finish(); return;
     }
-    // 2) Desktop download (not iOS — the download attribute is ignored there)
-    if(blob && !isIOS){
+    // 2) Real file download — desktop only (touch devices would navigate & crash the webview)
+    if(blob && !isTouch){
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');
       a.download=file.name; a.href=url; document.body.appendChild(a); a.click(); a.remove();

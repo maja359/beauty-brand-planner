@@ -322,16 +322,18 @@ Object.keys(STYLES).forEach(k=>{
    QUIZ — each option tagged to a style key. Tally → primary + lean.
    ============================================================ */
 const ORDER = ["clinical","quiet","botanical","editorial","playful","heritage"];
-// Photo questions render a real image per style from img/q/<key>/<style>.jpg
-// (drop files in to replace the tinted placeholder — see img/README.md).
-// The "word" question stays text-only by design.
+// Every question renders a real image per style from img/q/<key>/<style>.jpg
+// (see img/README.md). Tiles are shuffled per question, so no style sits in a
+// fixed spot and the final result reads as a surprise.
+// The "word" question shows a graphic with the word baked in; the words map below
+// stays as a clean text fallback if a word image is ever missing.
 const QUESTIONS = [
   { title:"Which palette pulls you in?",            key:"palette"   },
   { title:"Which packaging feels like your brand?", key:"packaging" },
   { title:"Pick a campaign mood.",                  key:"mood"      },
   { title:"Which texture speaks to you?",           key:"texture"   },
   { title:"Choose a typography vibe.",              key:"type"      },
-  { title:"One word for the brand.", kind:"word",
+  { title:"One word for the brand.", key:"word",
     words:{clinical:"Proven",quiet:"Refined",botanical:"Natural",editorial:"Bold",playful:"Fun",heritage:"Storied"} }
 ];
 
@@ -352,13 +354,17 @@ function renderQ(){
   // progress
   const pr=document.getElementById('progress'); pr.innerHTML='';
   QUESTIONS.forEach((_,i)=>{const s=document.createElement('span');if(i<=qi)s.className='on';pr.appendChild(s);});
-  // tiles — real photo per style (no style name shown, so the pick stays gut-level)
+  // tiles — real photo per style (no style name shown, so the pick stays gut-level).
+  // Shuffle a fresh copy of ORDER each question so styles never sit in a fixed spot
+  // and the final result feels like a surprise (scoring uses the key, not position).
   const grid=document.getElementById('q-grid'); grid.innerHTML='';
-  ORDER.forEach(key=>{
+  const keys=ORDER.slice().sort(()=>Math.random()-0.5);
+  keys.forEach(key=>{
     const st=STYLES[key];
     const t=document.createElement('button'); t.className='tile';
-    if(q.kind==='word'){
-      t.innerHTML=`<div class="vis" style="background:${st.bg};color:${st.ink};font-family:var(--serif);font-size:30px">${q.words[key]}</div>`;
+    if(q.key==='word'){
+      // word baked into the graphic; the word text shows underneath as a fallback if the file is missing
+      t.innerHTML=`<div class="vis" style="background:${st.bg};color:${st.ink};font-family:var(--serif);font-size:30px">${q.words[key]}<img src="img/q/word/${key}.jpg" alt="" onerror="this.remove()"></div>`;
     } else {
       // missing file degrades to a clean tinted block (onerror removes the broken img)
       t.innerHTML=`<div class="vis" style="background:${st.bg}"><img src="img/q/${q.key}/${key}.jpg" alt="" onerror="this.remove()"></div>`;

@@ -69,7 +69,8 @@
     display:flex;flex-direction:column;text-align:left;
   }
   .tile:hover{transform:translateY(-3px);box-shadow:0 16px 30px -14px rgba(0,0,0,.25)}
-  .tile .vis{flex:1;display:flex;align-items:center;justify-content:center;font-weight:600;position:relative}
+  .tile .vis{flex:1;display:flex;align-items:center;justify-content:center;font-weight:600;position:relative;overflow:hidden}
+  .tile .vis img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .tile .cap{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;padding:9px 10px;background:#fff;color:var(--bbp-ink);font-weight:600;font-family:var(--sans)}
   .tile .swatches{position:absolute;inset:0;display:flex;flex-direction:column}
   .tile .swatches i{flex:1}
@@ -321,11 +322,15 @@ Object.keys(STYLES).forEach(k=>{
    QUIZ — each option tagged to a style key. Tally → primary + lean.
    ============================================================ */
 const ORDER = ["clinical","quiet","botanical","editorial","playful","heritage"];
+// Photo questions render a real image per style from img/q/<key>/<style>.jpg
+// (drop files in to replace the tinted placeholder — see img/README.md).
+// The "word" question stays text-only by design.
 const QUESTIONS = [
-  { title:"Which palette pulls you in?", kind:"palette" },
-  { title:"Which packaging feels like your brand?", kind:"pack" },
-  { title:"Pick a campaign mood.", kind:"mood" },
-  { title:"Choose a typography vibe.", kind:"type" },
+  { title:"Which palette pulls you in?",            key:"palette"   },
+  { title:"Which packaging feels like your brand?", key:"packaging" },
+  { title:"Pick a campaign mood.",                  key:"mood"      },
+  { title:"Which texture speaks to you?",           key:"texture"   },
+  { title:"Choose a typography vibe.",              key:"type"      },
   { title:"One word for the brand.", kind:"word",
     words:{clinical:"Proven",quiet:"Refined",botanical:"Natural",editorial:"Bold",playful:"Fun",heritage:"Storied"} }
 ];
@@ -347,34 +352,24 @@ function renderQ(){
   // progress
   const pr=document.getElementById('progress'); pr.innerHTML='';
   QUESTIONS.forEach((_,i)=>{const s=document.createElement('span');if(i<=qi)s.className='on';pr.appendChild(s);});
-  // tiles
+  // tiles — real photo per style (no style name shown, so the pick stays gut-level)
   const grid=document.getElementById('q-grid'); grid.innerHTML='';
   ORDER.forEach(key=>{
     const st=STYLES[key];
     const t=document.createElement('button'); t.className='tile';
-    let vis='';
-    if(q.kind==='palette'){
-      vis=`<div class="swatches">${st.palette.map(p=>`<i style="background:${p[0]}"></i>`).join('')}</div>`;
-      t.innerHTML=`<div class="vis">${vis}</div>`;
-    } else if(q.kind==='type'){
-      t.innerHTML=`<div class="vis" style="background:${st.bg};color:${st.ink}"><span class="typ" style="font-family:var(--serif)">Aa</span></div>`;
-    } else if(q.kind==='mood'){
-      t.innerHTML=`<div class="vis" style="background:${st.bg}"><div class="mood" style="background:linear-gradient(180deg,transparent,${st.ink}cc);color:#fff">${st.moods[0]}</div></div>`;
-    } else if(q.kind==='word'){
-      t.innerHTML=`<div class="vis" style="background:${st.bg};color:${st.ink};font-family:var(--serif);font-size:28px">${q.words[key]}</div>`;
-    } else { // pack
-      t.innerHTML=`<div class="vis" style="background:${st.bg}"><div style="width:42%;height:64%;background:${st.palette[3][0]};border-radius:6px 6px 3px 3px;position:relative">
-        <div style="position:absolute;left:50%;top:8px;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:${st.palette[4][0]}"></div>
-        <div style="position:absolute;bottom:10px;left:0;right:0;height:30%;background:${st.palette[0][0]};opacity:.85"></div></div></div>`;
+    if(q.kind==='word'){
+      t.innerHTML=`<div class="vis" style="background:${st.bg};color:${st.ink};font-family:var(--serif);font-size:30px">${q.words[key]}</div>`;
+    } else {
+      // missing file degrades to a clean tinted block (onerror removes the broken img)
+      t.innerHTML=`<div class="vis" style="background:${st.bg}"><img src="img/q/${q.key}/${key}.jpg" alt="" onerror="this.remove()"></div>`;
     }
-    t.innerHTML+=`<div class="cap">${st.flat.split(' / ')[0]}</div>`;
     t.onclick=()=>pick(key);
     grid.appendChild(t);
   });
 }
 
 function pick(key){
-  scores[key]+= (qi===0?2:1); // palette weighted slightly
+  scores[key]+= (QUESTIONS[qi].key==='palette'?2:1); // palette weighted, so an all-different run still has a decisive winner
   qi++;
   if(qi<QUESTIONS.length){ renderQ(); }
   else { computeResult(); show('gate'); }
@@ -382,7 +377,10 @@ function pick(key){
 
 let primary, lean;
 function computeResult(){
-  const ranked=ORDER.slice().sort((a,b)=>scores[b]-scores[a]);
+  // shuffle first, then stable-sort by score: ties resolve randomly instead of always favouring clinical
+  const ranked=ORDER.slice()
+    .sort(()=>Math.random()-0.5)
+    .sort((a,b)=>scores[b]-scores[a]);
   primary=ranked[0]; lean=ranked[1];
   buildResult();
 }
@@ -425,7 +423,7 @@ function buildResult(){
   const board = st.moods.map((m,i)=>{
     const u = st.imgs ? st.imgs[i] : null;
     return `<div class="ph" style="background:${st.palette[2][0]}33">
-      ${u?`<img src="${u}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''}
+      ${u?`<img src="${u}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''}
       <span class="ph-lbl"${u?' style="display:none"':''}>${m}</span>
     </div>`;
   }).join('');
@@ -504,42 +502,54 @@ function move(d){ goto(slideIdx+d); }
 
 /* ----- Save / share the current card (mobile share sheet, desktop download) -----
    Self-hosted fonts + same-origin photos keep the canvas clean, so toBlob works on iOS. */
+const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 async function downloadSlide(btn){
   const el=document.querySelectorAll('#slides .slide')[slideIdx];
   const label = btn ? btn.textContent : '';
+  const finish=()=>{ if(btn){ btn.disabled=false; btn.textContent=label; } };
   if(btn){ btn.disabled=true; btn.textContent='Preparing…'; }
   try{
     if(document.fonts && document.fonts.ready){ await document.fonts.ready; }
-    const canvas=await html2canvas(el,{scale:3,backgroundColor:null,useCORS:true,logging:false});
-    const blob=await new Promise(res=>canvas.toBlob(res,'image/png'));
-    const finish=()=>{ if(btn){ btn.disabled=false; btn.textContent=label; } };
+    // wait for every photo in the card to finish loading, else html2canvas hangs or captures blanks
+    await Promise.all([...el.querySelectorAll('img')].map(img=>
+      img.complete?Promise.resolve():new Promise(r=>{img.onload=img.onerror=r;})));
+    const canvas=await html2canvas(el,{scale:2,backgroundColor:null,useCORS:true,logging:false});
+    const blob=await new Promise(res=>canvas.toBlob(res,'image/png',0.95));
+    const file=blob?new File([blob],`beauty-brand-aesthetic-${slideIdx+1}.png`,{type:'image/png'}):null;
 
-    if(!blob){
-      // toBlob can return null on some mobile browsers — fall back to data URL.
-      const a=document.createElement('a');
-      a.download=`beauty-brand-aesthetic-${slideIdx+1}.png`;
-      a.href=canvas.toDataURL('image/png');
-      document.body.appendChild(a); a.click(); a.remove();
+    // 1) Native share sheet (mobile) — straight to Stories / save to photos
+    if(file && navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file],title:'My beauty brand aesthetic'}); }
+      catch(_){ /* user cancelled — stop here, never navigate to a data URL (that kills the page on iOS) */ }
       finish(); return;
     }
-
-    const file=new File([blob],`beauty-brand-aesthetic-${slideIdx+1}.png`,{type:'image/png'});
-    // Mobile: native share sheet (post straight to Stories / save to photos)
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      try{ await navigator.share({files:[file],title:'My beauty brand aesthetic'}); finish(); return; }
-      catch(_){ /* cancelled or unsupported -> fall through to download */ }
+    // 2) Desktop download (not iOS — the download attribute is ignored there)
+    if(blob && !isIOS){
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.download=file.name; a.href=url; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),4000);
+      finish(); return;
     }
-    // Desktop / fallback: download
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.download=file.name; a.href=url; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),4000);
+    // 3) Fallback (iOS / in-app browsers without file-share): show the image to long-press & save
+    showSaveOverlay(canvas.toDataURL('image/png'));
     finish();
   }catch(err){
     console.warn('[BBP] save failed:',err);
-    if(btn){ btn.disabled=false; btn.textContent=label; }
-    alert('Could not generate the image here. Try a screenshot, or open on another browser.');
+    finish();
+    alert('Could not generate the image here. Try a screenshot, or open the quiz in Safari/Chrome.');
   }
+}
+
+function showSaveOverlay(src){
+  const o=document.createElement('div');
+  o.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px';
+  o.innerHTML=`<img src="${src}" style="max-width:90%;max-height:72vh;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.5)">
+    <div style="color:#fff;font-family:var(--sans);font-size:13px;text-align:center;opacity:.92;line-height:1.4">Press and hold the image<br>to save or share it.</div>
+    <button style="background:#fff;border:none;border-radius:100px;padding:12px 28px;font-family:var(--sans);font-weight:600;font-size:13px;cursor:pointer">Done</button>`;
+  o.querySelector('button').onclick=()=>o.remove();
+  o.addEventListener('click',e=>{ if(e.target===o)o.remove(); });
+  document.body.appendChild(o);
 }
 
 function bookCall(){ window.open(CONFIG.CALENDLY,'_blank'); }

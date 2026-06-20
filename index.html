@@ -211,11 +211,6 @@
 <!-- ============ RESULT ============ -->
 <section class="screen" id="result">
   <div class="logo topbar">Beauty Brand <em>Planner</em></div>
-  <div class="result-intro">
-    <div class="meta">Your beauty brand aesthetic</div>
-    <h2 id="r-name"></h2>
-    <h2 style="font-family:var(--sans)"><small id="r-lean"></small></h2>
-  </div>
 
   <div class="carousel">
     <button class="nav" onclick="move(-1)">‹</button>
@@ -461,8 +456,6 @@ function buildResult(){
   const st=STYLES[primary];
   const ink=readableInk(st.ink);
   const T=TYPE[primary];
-  document.getElementById('r-name').innerHTML=st.flat;
-  document.getElementById('r-lean').textContent='with a '+STYLES[lean].flat.split(' / ')[0]+' lean';
 
   const wrap=document.getElementById('slides'); wrap.innerHTML='';
   const credit=`<div class="credit"><b>crafted with Owlsome</b><span>weareowlsome.com</span></div>`;

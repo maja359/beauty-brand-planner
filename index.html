@@ -179,7 +179,7 @@ pintrk('load','2612945747997');pintrk('page');
   /* ---------- RESULT · TYPOGRAPHY CARD (real fonts) ---------- */
   .s-type .type-pair{display:flex;flex-direction:column;gap:20px;text-align:center;margin-top:4px}
   .tp-lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.5;margin-bottom:7px;font-family:var(--sans)}
-  .tp-head{font-size:42px;line-height:1.02}
+  .tp-head{font-size:42px;line-height:1.02;font-weight:600;letter-spacing:-.01em}
   .tp-body{font-size:14.5px;line-height:1.55}
   .tp-note{font-size:13px;line-height:1.5;opacity:.72;font-family:var(--sans);border-top:1px solid currentColor;padding-top:15px}
   /* ---------- RESULT · CHARACTER CARD ---------- */
@@ -528,7 +528,7 @@ function buildResult(){
       <div class="type-pair">
         <div class="tp-row">
           <div class="tp-lbl">Headline · ${T.head}</div>
-          <div class="tp-head" style="font-family:'${T.head}'">${st.keywords[0]} by design</div>
+          <div class="tp-head" style="font-family:'${T.head}'${T.head==='Spectral'?';letter-spacing:-.025em':''}">${st.keywords[0]} by design</div>
         </div>
         <div class="tp-row">
           <div class="tp-lbl">Body · ${T.body}</div>

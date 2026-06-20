@@ -22,7 +22,7 @@ pintrk('load','2612945747997');pintrk('page');
 <!-- real recommended fonts for the Typography result card -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Cormorant:wght@500;600;700&family=EB+Garamond:wght@500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500&family=Inter+Tight:wght@500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=EB+Garamond:wght@500;600&family=Hanken+Grotesk:wght@400;500&family=Inter:wght@400;500&family=Inter+Tight:wght@500;600;700&family=Lora:wght@400;500&family=Manrope:wght@400;500&family=Newsreader:wght@500;600&family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500&family=Spectral:wght@500;600&family=Syne:wght@600;700&display=swap" rel="stylesheet">
 <style>
   /* ---------- BRAND FONTS (self-hosted: exact match to beautybrandplanner.com,
      and same-origin so the result card renders to canvas on mobile) ---------- */
@@ -294,7 +294,7 @@ const STYLES = {
     bg:"#EFE9E0", ink:"#2E2A24",
     pos:"Expensive without shouting.",
     palette:[["#F3EEE7","F3EEE7"],["#E0D8CC","E0D8CC"],["#C3B7A4","C3B7A4"],["#8A7E6B","8A7E6B"],["#2E2A24","2E2A24"]],
-    typeName:"Cormorant + Inter",
+    typeName:"Spectral + Manrope",
     keywords:["Refined","Restrained","Timeless"],
     refs:"Nécessaire · Augustinus Bader · MERIT · Westman Atelier",
     leanIn:"Generous space, stone and cream, soft light, tactile product shots.",
@@ -307,7 +307,7 @@ const STYLES = {
     bg:"#ECEFE2", ink:"#3a4a2f",
     pos:"Grounded, sensory, real.",
     palette:[["#EAEDE1","EAEDE1"],["#C7D2B4","C7D2B4"],["#93A878","93A878"],["#C99A78","C99A78"],["#5b4a37","5B4A37"]],
-    typeName:"Fraunces + Inter",
+    typeName:"Newsreader + Hanken Grotesk",
     keywords:["Warm","Natural","Grounded"],
     refs:"Susanne Kaufmann · F. Miller · Bamford · Aurelia London",
     leanIn:"Botanical ingredients, natural texture, warm light, ritual imagery.",
@@ -320,7 +320,7 @@ const STYLES = {
     bg:"#111111", ink:"#FFFFFF",
     pos:"Made to be seen.",
     palette:[["#111111","111111"],["#FFFFFF","FFFFFF"],["#E2231A","E2231A"],["#1B33CC","1B33CC"],["#FF5A1F","FF5A1F"]],
-    typeName:"Archivo + Inter",
+    typeName:"Playfair Display + Archivo",
     keywords:["Bold","Editorial","Confident"],
     refs:"Topicals · Eadem · Isamaya · about-face",
     leanIn:"Oversized type, high contrast, fashion-led photography, strong styling.",
@@ -333,7 +333,7 @@ const STYLES = {
     bg:"#FFE9F1", ink:"#5a1133",
     pos:"Wellness that pops off the shelf.",
     palette:[["#FF7FB0","FF7FB0"],["#FF8A3D","FF8A3D"],["#57C4E5","57C4E5"],["#B6E34B","B6E34B"],["#FFD23E","FFD23E"]],
-    typeName:"Space Grotesk + Inter",
+    typeName:"Syne + Space Grotesk",
     keywords:["Fresh","Playful","Memorable"],
     refs:"Bubble · Starface · Glow Recipe · Vacation",
     leanIn:"Saturated colour, bold blocks, glossy texture, upbeat product sets.",
@@ -346,7 +346,7 @@ const STYLES = {
     bg:"#EDE5D6", ink:"#2C2117",
     pos:"Depth, craft, atmosphere.",
     palette:[["#E7DDC8","E7DDC8"],["#B68A4E","B68A4E"],["#5A5234","5A5234"],["#5C2230","5C2230"],["#2C2117","2C2117"]],
-    typeName:"EB Garamond + Inter",
+    typeName:"EB Garamond + Lora",
     keywords:["Rich","Crafted","Storied"],
     refs:"Le Labo · Aesop · Santa Maria Novella · Grown Alchemist",
     leanIn:"Moody product shots, dark glass, wrap labels, deeper tonal worlds.",
@@ -361,12 +361,12 @@ Object.keys(STYLES).forEach(k=>{
 
 // Real font pairings shown on the Typography result card (families loaded from Google Fonts above).
 const TYPE = {
-  clinical: {head:"Inter Tight",   body:"Inter", note:"Tight, even, engineered. Reads as precise and trustworthy without feeling cold."},
-  quiet:    {head:"Cormorant",     body:"Inter", note:"A high-contrast serif with quiet elegance, set light and airy so it feels expensive."},
-  botanical:{head:"Fraunces",      body:"Inter", note:"A soft, organic serif. Warm and human, but still polished enough to feel premium."},
-  editorial:{head:"Archivo",       body:"Inter", note:"A grotesque with attitude. Big, confident, built to carry an oversized headline."},
-  playful:  {head:"Space Grotesk", body:"Inter", note:"Geometric with little quirks. Modern, friendly, and a touch unexpected."},
-  heritage: {head:"EB Garamond",   body:"Inter", note:"A classic old-style serif. Crafted, storied and timeless on the page."}
+  clinical: {head:"Inter Tight",     body:"Inter",          note:"Tight, even, engineered, on a clean neutral sans. Precise and trustworthy without feeling cold."},
+  quiet:    {head:"Spectral",        body:"Manrope",        note:"A calm, modern serif over a soft, rounded sans. Considered and quietly expensive."},
+  botanical:{head:"Newsreader",      body:"Hanken Grotesk", note:"A friendly editorial serif with a warm, readable sans. Human and soft, still premium."},
+  editorial:{head:"Playfair Display",body:"Archivo",        note:"High-contrast fashion serif over a confident grotesque. Pure magazine energy."},
+  playful:  {head:"Syne",            body:"Space Grotesk",  note:"An arty, design-forward display on a geometric sans. Modern and a touch unexpected."},
+  heritage: {head:"EB Garamond",     body:"Lora",           note:"A classic old-style serif with a warm text serif. Crafted, storied and timeless."}
 };
 
 // Pick a text colour that stays readable on a white card (some styles use a light ink on dark).

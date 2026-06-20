@@ -44,7 +44,9 @@
   /* ---------- SCREENS ---------- */
   .screen{width:100%;max-width:760px;display:none;animation:fade .5s var(--ease)}
   .screen.active{display:block}
-  #intro.active{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 96px)}
+  #intro.active{display:flex;flex-direction:column;min-height:calc(100vh - 96px)}
+  #intro .intro{flex:1;justify-content:center}
+  .topbar{margin-bottom:14px;flex:0 0 auto}
   @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
   /* ---------- INTRO ---------- */
@@ -152,13 +154,16 @@
   .fineprint{font-size:11px;opacity:.5;line-height:1.4;max-width:320px;font-family:var(--sans)}
 
   /* ---------- RESULT · TYPOGRAPHY CARD (real fonts) ---------- */
-  .s-type .type-pair{display:flex;flex-direction:column;gap:20px;text-align:left;margin-top:4px}
+  .s-type .type-pair{display:flex;flex-direction:column;gap:20px;text-align:center;margin-top:4px}
   .tp-lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.5;margin-bottom:7px;font-family:var(--sans)}
   .tp-head{font-size:42px;line-height:1.02}
   .tp-body{font-size:14.5px;line-height:1.55}
   .tp-note{font-size:13px;line-height:1.5;opacity:.72;font-family:var(--sans);border-top:1px solid currentColor;padding-top:15px}
   /* ---------- RESULT · CHARACTER CARD ---------- */
   .char-pos{font-family:var(--serif);font-size:23px;line-height:1.25;margin-bottom:22px}
+  .char-img{width:100%;height:180px;border-radius:12px;overflow:hidden;margin-top:auto}
+  .char-img img{width:100%;height:100%;object-fit:cover;display:block}
+  .s-char .credit{margin-top:14px}
 
   /* ---------- INTRO · desktop sizing (mobile handled separately) ---------- */
   @media(min-width:768px){
@@ -171,8 +176,8 @@
 
 <!-- ============ INTRO ============ -->
 <section class="screen active" id="intro">
+  <div class="logo topbar">Beauty Brand <em>Planner</em></div>
   <div class="intro">
-    <div class="logo">Beauty Brand <em>Planner</em></div>
     <h1>What's your beauty brand aesthetic?</h1>
     <p>A 60-second visual quiz for beauty founders. Pick what you're drawn to, get the aesthetic your brand is reaching for, plus the palette, type and references behind it.</p>
     <button class="btn" onclick="start()">Start the quiz</button>
@@ -205,6 +210,7 @@
 
 <!-- ============ RESULT ============ -->
 <section class="screen" id="result">
+  <div class="logo topbar">Beauty Brand <em>Planner</em></div>
   <div class="result-intro">
     <div class="meta">Your beauty brand aesthetic</div>
     <h2 id="r-name"></h2>
@@ -514,13 +520,14 @@ function buildResult(){
 
   // SLIDE 4 — CHARACTER
   wrap.insertAdjacentHTML('beforeend',`
-    <div class="slide s-body" style="${baseStyle}">
+    <div class="slide s-body s-char" style="${baseStyle}">
       <div class="eyebrow">Character</div>
       <h3>How it should<br>feel.</h3>
       <div class="char-pos">${st.pos}</div>
       <div class="kw-list">${st.keywords.map(k=>`<span style="background:${ink}14">${k}</span>`).join('')}</div>
       <div class="ref-lbl">In good company</div>
       <div class="ref-list">${st.refs}</div>
+      <div class="char-img"><img src="img/${primary}/character.jpg" alt="" onerror="this.closest('.char-img').remove()"></div>
       ${credit}
     </div>`);
 

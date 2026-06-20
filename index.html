@@ -516,7 +516,6 @@ function buildResult(){
     <div class="slide s-body s-char" style="${baseStyle}">
       <div class="eyebrow">Character</div>
       <h3>How it should<br>feel.</h3>
-      <div class="char-pos">${st.pos}</div>
       <div class="kw-list">${st.keywords.map(k=>`<span style="background:${ink}14">${k}</span>`).join('')}</div>
       <div class="ref-lbl">In good company</div>
       <div class="ref-list">${st.refs}</div>
@@ -529,6 +528,7 @@ function buildResult(){
     <div class="slide s-body move" style="${baseStyle}">
       <div class="eyebrow">Your next move</div>
       <h3>Make it real.</h3>
+      <div class="char-pos">${st.pos}</div>
       <div class="row"><div class="t">Lean into</div><div class="d">${st.leanIn}</div></div>
       <div class="row"><div class="t">Avoid</div><div class="d">${st.avoid}</div></div>
       <div class="cta" style="background:${ink};color:#fff">This is a glimpse. Owlsome builds the real thing in 6 weeks → book a call</div>
@@ -571,8 +571,10 @@ async function downloadSlide(btn){
     }
     const file=blob?new File([blob],`beauty-brand-aesthetic-${slideIdx+1}.png`,{type:'image/png'}):null;
 
-    // 1) Native share sheet (mobile) — straight to Stories / save to photos
-    if(file && navigator.canShare && navigator.canShare({files:[file]})){
+    // 1) Native share sheet — touch devices only (phone/tablet → Stories / save to photos).
+    // Desktop is deliberately excluded: desktop Chrome now supports file-share too, but it opens a
+    // confusing share dialog instead of just saving — desktop should download the file directly (path 2).
+    if(isTouch && file && navigator.canShare && navigator.canShare({files:[file]})){
       try{ await navigator.share({files:[file],title:'My beauty brand aesthetic'}); }
       catch(_){ /* user cancelled — stop here, never navigate to a data URL (that kills the page on iOS) */ }
       finish(); return;

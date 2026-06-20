@@ -143,6 +143,15 @@
 
   .result-actions{display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap}
 
+  /* ---------- RESULT · EMAIL OFFER (result-first: visible result, email unlocks the kit) ---------- */
+  .result-offer{max-width:440px;margin:34px auto 0;text-align:center;background:var(--bbp-accent);border-radius:22px;padding:30px 26px}
+  .result-offer .meta{margin-bottom:8px}
+  .result-offer h3{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.1;margin-bottom:10px}
+  .result-offer p{font-size:14px;line-height:1.5;opacity:.8;margin:0 auto 16px;max-width:360px}
+  .result-offer form{display:flex;flex-direction:column;gap:10px;max-width:340px;margin:0 auto 12px}
+  .result-offer input{padding:14px 18px;border-radius:100px;border:1.5px solid rgba(26,26,26,.2);font-size:15px;font-family:var(--sans);background:#fff;text-align:center}
+  .result-offer .fineprint{margin:0 auto}
+
   /* ---------- EMAIL GATE ---------- */
   #gate{max-width:460px;text-align:center;flex-direction:column;gap:18px;align-items:center;min-height:calc(100vh - 96px);justify-content:center}
   #gate.active{display:flex}
@@ -194,20 +203,6 @@
   <div class="q-grid" id="q-grid"></div>
 </section>
 
-<!-- ============ EMAIL GATE ============ -->
-<section class="screen" id="gate">
-  <div class="logo">Beauty Brand <em>Planner</em></div>
-  <h2>Your aesthetic is ready.</h2>
-  <p>Drop your email and we'll send the high-res cards plus your free Beauty Brand Starter Kit, a workbook to turn this aesthetic into a real brand.</p>
-  <form onsubmit="submitEmail(event)">
-    <input type="text" id="fname" placeholder="First name (optional)" autocomplete="given-name">
-    <input type="email" id="email" placeholder="you@brand.com" required>
-    <button class="btn" type="submit">Show my result</button>
-  </form>
-  <button class="gate-skip" onclick="reveal()">Just show the result</button>
-  <div class="fineprint">No spam. One short series about your aesthetic, then you choose if we talk. Built by Owlsome Studio.</div>
-</section>
-
 <!-- ============ RESULT ============ -->
 <section class="screen" id="result">
   <div class="logo topbar">Beauty Brand <em>Planner</em></div>
@@ -218,6 +213,18 @@
     <button class="nav" onclick="move(1)">›</button>
   </div>
   <div class="dots" id="dots"></div>
+
+  <div class="result-offer" id="resultOffer">
+    <div class="meta">Your free download</div>
+    <h3>Turn this into a real brand.</h3>
+    <p>We'll email your free Beauty Brand Starter Kit, the workbook that turns this aesthetic into a real brand, with your result cards in high-res.</p>
+    <form onsubmit="submitEmail(event)">
+      <input type="text" id="fname" placeholder="First name (optional)" autocomplete="given-name">
+      <input type="email" id="email" placeholder="you@brand.com" required>
+      <button class="btn" type="submit">Send me the Starter Kit</button>
+    </form>
+    <div class="fineprint">No spam. One short series about your aesthetic, then you choose if we talk. Built by Owlsome Studio.</div>
+  </div>
 
   <div class="result-actions">
     <button class="btn" onclick="downloadSlide(this)">Save / share this card</button>
@@ -414,7 +421,7 @@ function pick(key){
   scores[key]+= (QUESTIONS[qi].key==='palette'?2:1); // palette weighted, so an all-different run still has a decisive winner
   qi++;
   if(qi<QUESTIONS.length){ renderQ(); }
-  else { computeResult(); show('gate'); }
+  else { computeResult(); show('result'); }
 }
 
 let primary, lean;
@@ -444,9 +451,10 @@ function submitEmail(e){
     f.querySelector('[name="'+CONFIG.AESTHETIC_FIELD+'"]').value=primary;
     try{ f.submit(); }catch(_){}
   }
-  reveal();
+  // result is already on screen — swap the offer block for an inline confirmation
+  const offer=document.getElementById('resultOffer');
+  if(offer){ offer.innerHTML=`<div class="meta">You're in</div><h3>Check your inbox.</h3><p>Your Starter Kit and result cards are on the way. If you don't see them in a couple of minutes, check spam or the Promotions tab.</p>`; }
 }
-function reveal(){ show('result'); }
 
 /* ============================================================
    RESULT CAROUSEL

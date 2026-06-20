@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>What's your beauty brand aesthetic? — Beauty Brand Planner</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- Meta Pixel (shared Owlsome pixel) -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','190686202207553');fbq('track','PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=190686202207553&ev=PageView&noscript=1"/></noscript>
+
+<!-- Pinterest Tag (shared Owlsome tag) -->
+<script>
+!function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version="3.0";var t=document.createElement("script");t.async=!0,t.src=e;var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
+pintrk('load','2612945747997');pintrk('page');
+</script>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://ct.pinterest.com/v3/?event=init&tid=2612945747997&noscript=1"/></noscript>
 <!-- real recommended fonts for the Typography result card -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -421,7 +435,10 @@ function pick(key){
   scores[key]+= (QUESTIONS[qi].key==='palette'?2:1); // palette weighted, so an all-different run still has a decisive winner
   qi++;
   if(qi<QUESTIONS.length){ renderQ(); }
-  else { computeResult(); show('result'); }
+  else { computeResult(); show('result');
+    window.fbq&&fbq('track','ViewContent',{content_name:'quiz_result',content_category:primary});
+    window.pintrk&&pintrk('track','viewcategory',{line_items:[{product_category:primary}]});
+  }
 }
 
 let primary, lean;
@@ -451,6 +468,9 @@ function submitEmail(e){
     f.querySelector('[name="'+CONFIG.AESTHETIC_FIELD+'"]').value=primary;
     try{ f.submit(); }catch(_){}
   }
+  // funnel conversion: email captured (shared Owlsome pixels)
+  window.fbq&&fbq('track','Lead',{content_name:'starter_kit_signup',content_category:primary});
+  window.pintrk&&pintrk('track','signup',{lead_type:'starter_kit'});
   // result is already on screen — swap the offer block for an inline confirmation
   const offer=document.getElementById('resultOffer');
   if(offer){ offer.innerHTML=`<div class="meta">You're in</div><h3>Check your inbox.</h3><p>Your Starter Kit and result cards are on the way. If you don't see them in a couple of minutes, check spam or the Promotions tab.</p>`; }
@@ -624,7 +644,11 @@ function showSaveOverlay(src){
   document.body.appendChild(o);
 }
 
-function bookCall(){ window.open(CONFIG.CALENDLY,'_blank'); }
+function bookCall(){
+  window.fbq&&fbq('track','Schedule',{content_name:'project_fit_call'});
+  window.pintrk&&pintrk('track','lead',{lead_type:'book_call'});
+  window.open(CONFIG.CALENDLY,'_blank');
+}
 function restart(){ show('intro'); }
 </script>
 </body>
